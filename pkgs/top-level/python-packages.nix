@@ -21246,4 +21246,48 @@ let
     };
   };
 
+  xmlrunner = buildPythonPackage rec {
+    name = "xmlrunner-${version}";
+    version = "1.7.7";
+    doCheck = false;
+    src = pkgs.fetchurl {
+        url = "https://pypi.python.org/packages/source/x/xmlrunner/xmlrunner-1.7.7.tar.gz";
+        md5 = "7b0b152ed2d278516aedbc0cac22dfb3";
+    };
+    meta = {
+        description = "PyUnit-based test runner with JUnit like XML reporting.";
+    };
+
+  };
+
+  vsc-base = buildPythonPackage rec {
+    name = "vsc-base-${version}";
+    version = "2.4.2";
+    src = pkgs.fetchurl {
+        url = "https://pypi.python.org/packages/source/v/vsc-base/${name}.tar.gz";
+        md5 = "e2be08dce78819c42626e52fa7ca4f1c";
+    };
+    
+    meta = {
+        description = "The vsc base";
+    };
+
+  };
+
+  easybuild-framework = buildPythonPackage rec {
+      name = "easybuild-framework-${version}";
+      version = "v2.4.0";
+      doCheck = false;
+      buildInputs = with self; [ xmlrunner ];
+      propagatedBuildInputs = with self; [ vsc-base pyyaml ];
+      src = pkgs.fetchurl {
+        url = "https://github.com/hpcugent/easybuild-framework/archive/${name}.tar.gz";
+        sha256 = "314eb8d9e900e80445e57fc961c369e12536fe3cc936b3a5e5c84048630f460f";
+      };
+
+      meta = {
+        description = "The EasyBuild framework";
+      };
+  };
+
 }; in pythonPackages
