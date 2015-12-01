@@ -15350,6 +15350,9 @@ let
 
   mg = callPackage ../applications/editors/mg { };
 
+  lmod = callPackage ../tools/system/lmod { 
+    inherit (luaPackages) luafilesystem luaposix;
+  };
 }; # self_ =
 
 

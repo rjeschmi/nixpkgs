@@ -21276,18 +21276,49 @@ let
 
   easybuild-framework = buildPythonPackage rec {
       name = "easybuild-framework-${version}";
-      version = "v2.4.0";
+      version = "2.4.0";
       doCheck = false;
       buildInputs = with self; [ xmlrunner ];
       propagatedBuildInputs = with self; [ vsc-base pyyaml ];
       src = pkgs.fetchurl {
-        url = "https://github.com/hpcugent/easybuild-framework/archive/${name}.tar.gz";
-        sha256 = "314eb8d9e900e80445e57fc961c369e12536fe3cc936b3a5e5c84048630f460f";
+        url = "https://pypi.python.org/packages/source/e/easybuild-framework/${name}.tar.gz";
+        md5 = "3fc76a2e72f5a0392f722ef11a64c56b";
       };
 
       meta = {
         description = "The EasyBuild framework";
       };
   };
+  
+  easybuild-easyblocks = buildPythonPackage rec {
+      name = "easybuild-easyblocks-${version}";
+      version = "2.4.0";
+      doCheck = false;
+      propagatedBuildInputs = with self; [ easybuild-framework ];
+      src = pkgs.fetchurl {
+        url = "https://pypi.python.org/packages/source/e/easybuild-easyblocks/${name}.tar.gz";
+        md5 = "2eaf3b8134257bbfccfc938281136c72";
+      };
+
+      meta = {
+        description = "The EasyBuild framework";
+      };
+  };
+  
+  easybuild-easyconfigs = buildPythonPackage rec {
+      name = "easybuild-easyconfigs-${version}";
+      version = "2.4.0";
+      doCheck = false;
+      propagatedBuildInputs = with self; [ easybuild-easyblocks ];
+      src = pkgs.fetchurl {
+        url = "https://pypi.python.org/packages/source/e/easybuild-easyconfigs/${name}.tar.gz";
+        md5 = "8554eeb59d4539a9dc70bf0b134fa332";
+      };
+
+      meta = {
+        description = "The EasyBuild framework";
+      };
+  };
+ 
 
 }; in pythonPackages
