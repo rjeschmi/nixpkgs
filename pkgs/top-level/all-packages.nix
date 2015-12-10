@@ -15353,6 +15353,10 @@ let
   lmod = callPackage ../tools/system/lmod { 
     inherit (luaPackages) luafilesystem luaposix;
   };
+
+  easybuild = pythonPackages.easybuild-easyconfigs;
+
+  ebPackages = recurseIntoAttrs (callPackage ./easybuild.nix {  });
 }; # self_ =
 
 

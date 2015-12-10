@@ -21319,6 +21319,5 @@ let
         description = "The EasyBuild framework";
       };
   };
- 
 
 }; in pythonPackages
