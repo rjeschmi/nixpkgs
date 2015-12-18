@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, perl, tcl, lua, luafilesystem, luaposix, rsync }:
+{ stdenv, fetchurl, perl, tcl, lua, luafilesystem, luaposix, rsync, procps }:
 
 stdenv.mkDerivation rec {
   name = "Lmod-${version}";
@@ -9,8 +9,8 @@ stdenv.mkDerivation rec {
     sha256 = "89885202fb4d3308be9150758cde079732ba774d96a5c35b6f8ec9bfd0c58653";
   };
 
-  buildInputs = [ lua tcl luafilesystem luaposix perl rsync];
-
+  buildInputs = [ lua tcl perl rsync procps ];
+  propagatedBuildInputs = [ luaposix luafilesystem ];
   preConfigure = '' makeFlags="PREFIX=$out" '';
 
   LUA_PATH="${luaposix}/share/lua/5.2/?.lua;;";
