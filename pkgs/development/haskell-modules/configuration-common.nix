@@ -64,13 +64,15 @@ self: super: {
   # all required dependencies are part of Stackage. To comply with Stackage, we
   # make 'git-annex-without-assistant' our default version, but offer another
   # build which has the assistant to be used in the top-level.
-  git-annex_5_20151019 = (disableCabalFlag super.git-annex_5_20151019 "assistant").override {
+  git-annex_5_20150727 = (disableCabalFlag super.git-annex_5_20150727 "assistant").override {
     dbus = if pkgs.stdenv.isLinux then self.dbus else null;
+    lsof = if pkgs.stdenv.isLinux then pkgs.lsof else null;
     fdo-notify = if pkgs.stdenv.isLinux then self.fdo-notify else null;
     hinotify = if pkgs.stdenv.isLinux then self.hinotify else self.fsnotify;
   };
   git-annex = (disableCabalFlag super.git-annex "assistant").override {
     dbus = if pkgs.stdenv.isLinux then self.dbus else null;
+    lsof = if pkgs.stdenv.isLinux then pkgs.lsof else null;
     fdo-notify = if pkgs.stdenv.isLinux then self.fdo-notify else null;
     hinotify = if pkgs.stdenv.isLinux then self.hinotify else self.fsnotify;
   };
@@ -114,7 +116,24 @@ self: super: {
     preConfigure = "sed -i -e /extra-lib-dirs/d -e /include-dirs/d haskakafka.cabal";
     configureFlags =  "--extra-include-dirs=${pkgs.rdkafka}/include/librdkafka";
     doCheck = false;
-   });
+  });
+
+  # Depends on broken "lss" package.
+  snaplet-lss = dontDistribute super.snaplet-lss;
+
+  # Depends on broken "NewBinary" package.
+  ASN1 = dontDistribute super.ASN1;
+
+  # Depends on broken "frame" package.
+  frame-markdown = dontDistribute super.frame-markdown;
+
+  # Depends on broken "Elm" package.
+  hakyll-elm = dontDistribute super.hakyll-elm;
+  haskelm = dontDistribute super.haskelm;
+  snap-elm = dontDistribute super.snap-elm;
+
+  # Depends on broken "hails" package.
+  hails-bin = dontDistribute super.hails-bin;
 
   # Foreign dependency name clashes with another Haskell package.
   libarchive-conduit = super.libarchive-conduit.override { archive = pkgs.libarchive; };
@@ -229,9 +248,14 @@ self: super: {
   jwt = dontCheck super.jwt;
 
   # https://github.com/NixOS/cabal2nix/issues/136
-  glib = addBuildDepends super.glib [pkgs.pkgconfig pkgs.glib];
+  gio = addPkgconfigDepend super.gio pkgs.glib;
+  gio_0_13_0_3 = addPkgconfigDepend super.gio_0_13_0_3 pkgs.glib;
+  gio_0_13_0_4 = addPkgconfigDepend super.gio_0_13_0_4 pkgs.glib;
+  gio_0_13_1_0 = addPkgconfigDepend super.gio_0_13_1_0 pkgs.glib;
+  glib = addPkgconfigDepend super.glib pkgs.glib;
   gtk3 = super.gtk3.override { inherit (pkgs) gtk3; };
-  gtk = addBuildDepends super.gtk [pkgs.pkgconfig pkgs.gtk];
+  gtk = addPkgconfigDepend super.gtk pkgs.gtk;
+  gtksourceview2 = (addPkgconfigDepend super.gtksourceview2 pkgs.gtk2).override { inherit (pkgs.gnome2) gtksourceview; };
   gtksourceview3 = super.gtksourceview3.override { inherit (pkgs.gnome3) gtksourceview; };
 
   # Need WebkitGTK, not just webkit.
@@ -407,7 +431,6 @@ self: super: {
   hs2048 = dontCheck super.hs2048;
   hsbencher = dontCheck super.hsbencher;
   hsexif = dontCheck super.hsexif;
-  hsparql = dontCheck super.hsparql; # https://github.com/robstewart57/hsparql/issues/15
   hspec-server = dontCheck super.hspec-server;
   HTF = dontCheck super.HTF;
   HTF_0_12_2_3 = dontCheck super.HTF_0_12_2_3;
@@ -448,7 +471,6 @@ self: super: {
   punycode = dontCheck super.punycode;
   pwstore-cli = dontCheck super.pwstore-cli;
   quantities = dontCheck super.quantities;
-  rdf4h = dontCheck super.rdf4h; # https://github.com/robstewart57/rdf4h/issues/32
   redis-io = dontCheck super.redis-io;
   rethinkdb = dontCheck super.rethinkdb;
   Rlang-QQ = dontCheck super.Rlang-QQ;
@@ -664,9 +686,6 @@ self: super: {
   # https://github.com/nushio3/doctest-prop/issues/1
   doctest-prop = dontCheck super.doctest-prop;
 
-  # https://github.com/adamwalker/sdr/issues/1
-  sdr = dontCheck super.sdr;
-
   # https://github.com/bos/aeson/issues/253
   aeson = dontCheck super.aeson;
 
@@ -709,6 +728,10 @@ self: super: {
   yesod-bin = if pkgs.stdenv.isDarwin
     then addBuildDepend super.yesod-bin pkgs.darwin.apple_sdk.frameworks.Cocoa
     else super.yesod-bin;
+
+  hmatrix = if pkgs.stdenv.isDarwin
+    then addBuildDepend super.hmatrix pkgs.darwin.apple_sdk.frameworks.Accelerate
+    else super.hmatrix;
 
   # https://github.com/commercialhaskell/stack/issues/408
   # https://github.com/commercialhaskell/stack/issues/409
@@ -802,6 +825,8 @@ self: super: {
 
   # Byte-compile elisp code for Emacs.
   hindent = overrideCabal super.hindent (drv: {
+    # https://github.com/chrisdone/hindent/issues/166
+    doCheck = false;
     executableToolDepends = drv.executableToolDepends or [] ++ [pkgs.emacs];
     postInstall = ''
       local lispdir=( "$out/share/"*"-${self.ghc.name}/${drv.pname}-${drv.version}/elisp" )
@@ -922,7 +947,10 @@ self: super: {
     librarySystemDepends = (drv.librarySystemDepends or []) ++ [ pkgs.ncurses ];
   });
 
-  # Re-build this package to fix broken binaries on Hydra.
-  math-functions = triggerRebuild super.math-functions 1;
+  # https://github.com/mainland/language-c-quote/issues/57
+  language-c-quote = super.language-c-quote.override { alex = self.alex_3_1_4; };
+
+  # The package doesn't yet compile with new HSE: https://github.com/bmillwood/pointfree/pull/13
+  pointfree = super.pointfree.override { haskell-src-exts = self.haskell-src-exts_1_16_0_1; };
 
 }

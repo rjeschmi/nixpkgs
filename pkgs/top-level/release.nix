@@ -13,9 +13,10 @@
 , officialRelease ? false
 , # The platforms for which we build Nixpkgs.
   supportedSystems ? [ "x86_64-linux" "i686-linux" "x86_64-darwin" ]
+, scrubJobs ? true
 }:
 
-with import ./release-lib.nix { inherit supportedSystems; };
+with import ./release-lib.nix { inherit supportedSystems scrubJobs; };
 
 let
 
@@ -65,7 +66,6 @@ let
       binutils = linux;
       bind = linux;
       bvi = all;
-      castle_combat = linux;
       cdrkit = linux;
       classpath = linux;
       ddrescue = linux;
@@ -130,7 +130,7 @@ let
       lynx = linux;
       lzma = linux;
       man = linux;
-      manpages = linux;
+      man-pages = linux;
       maxima = linux;
       mc = linux;
       mcabber = linux;
@@ -160,7 +160,6 @@ let
       pmccabe = linux;
       ppl = all;
       procps = linux;
-      pthreadmanpages = linux;
       pygtk = linux;
       python = allBut cygwin;
       pythonFull = linux;
@@ -226,6 +225,8 @@ let
 
       haskell.compiler = packagePlatforms pkgs.haskell.compiler;
       haskellPackages = packagePlatforms pkgs.haskellPackages;
+
+      rPackages = packagePlatforms pkgs.rPackages;
 
       strategoPackages = {
         sdf = linux;

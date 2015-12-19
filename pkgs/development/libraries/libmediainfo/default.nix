@@ -1,11 +1,11 @@
 { stdenv, fetchurl, automake, autoconf, libtool, pkgconfig, libzen, zlib }:
 
 stdenv.mkDerivation rec {
-  version = "0.7.78";
+  version = "0.7.80";
   name = "libmediainfo-${version}";
   src = fetchurl {
     url = "http://mediaarea.net/download/source/libmediainfo/${version}/libmediainfo_${version}.tar.xz";
-    sha256 = "0ai4al5h3qbfq5f1b24ixk5v1fpln2kw1zmdj4hxjz40rj18qzka";
+    sha256 = "0v9px37qx0dkx67gqwi1rd9x4m7zm1ml8sdj5fx0isj6qymbd1z5";
   };
 
   buildInputs = [ automake autoconf libtool pkgconfig libzen zlib ];

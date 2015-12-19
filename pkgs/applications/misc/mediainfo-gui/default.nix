@@ -1,11 +1,11 @@
 { stdenv, fetchurl, automake, autoconf, libtool, pkgconfig, libzen, libmediainfo, wxGTK, desktop_file_utils, libSM, imagemagick }:
 
 stdenv.mkDerivation rec {
-  version = "0.7.78";
+  version = "0.7.80";
   name = "mediainfo-gui-${version}";
   src = fetchurl {
     url = "http://mediaarea.net/download/source/mediainfo/${version}/mediainfo_${version}.tar.xz";
-    sha256 = "0458rxla3nhw9rbb2psak8qvxwr0drfhdl82k6wvb3a38xb0qij3";
+    sha256 = "12iwiw4vcmyi8l04j540kbqifmr1wnlfw5cway185iqia43s6c10";
   };
 
   buildInputs = [ automake autoconf libtool pkgconfig libzen libmediainfo wxGTK desktop_file_utils libSM imagemagick ];

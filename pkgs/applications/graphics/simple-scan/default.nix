@@ -1,27 +1,29 @@
-{ stdenv, fetchurl, cairo, colord, glib, gtk3, gusb, intltool, itstool, libusb
-, libxml2, makeWrapper, pkgconfig, saneBackends, systemd, vala }:
+{ stdenv, fetchurl, cairo, colord, glib, gtk3, gusb, intltool, itstool
+, libusb1, libxml2, pkgconfig, saneBackends, vala, wrapGAppsHook }:
 
-let version = "3.19.1"; in
+let version = "3.19.3"; in
 stdenv.mkDerivation rec {
   name = "simple-scan-${version}";
 
   src = fetchurl {
-    sha256 = "1d2a8cncq36ly60jpz0fzdw1lgxynl6lyrlw0q66yijlxqn81ynr";
+    sha256 = "0il7ikd5hj9mgzrivm01g572g9101w8la58h3hjyakwcfw3jp976";
     url = "https://launchpad.net/simple-scan/3.19/${version}/+download/${name}.tar.xz";
   };
 
-  buildInputs = [ cairo colord glib gusb gtk3 libusb libxml2 saneBackends
-    systemd vala ];
-  nativeBuildInputs = [ intltool itstool makeWrapper pkgconfig ];
+  buildInputs = [ cairo colord glib gusb gtk3 libusb1 libxml2 saneBackends
+    vala ];
+  nativeBuildInputs = [ intltool itstool pkgconfig wrapGAppsHook ];
+
+  configureFlags = [ "--disable-packagekit" ];
+
+  preBuild = ''
+    # Clean up stale generated .c files still referencing packagekit headers:
+    make clean
+  '';
 
   enableParallelBuilding = true;
 
   doCheck = true;
-
-  preFixup = ''
-    wrapProgram "$out/bin/simple-scan" \
-      --prefix XDG_DATA_DIRS : "$GSETTINGS_SCHEMAS_PATH"
-  '';
 
   meta = with stdenv.lib; {
     inherit version;
